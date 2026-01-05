@@ -7,17 +7,15 @@
     
     <!-- PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <!-- Font -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- DESIGN SYSTEM (Purple Theme & Wider Layout) --- */
+        /* --- DESIGN SYSTEM: PURPLE & WIDE --- */
         :root {
-            /* Changed Sidebar to PURPLE based on your screenshot */
             --sidebar-bg: #4a148c; 
             --sidebar-text: #e1bee7;
             --sidebar-active: #ffffff;
-            
             --accent: #4a148c;
             --accent-light: rgba(74, 20, 140, 0.08);
             --bg-main: #f3f4f6;
@@ -69,7 +67,7 @@
             display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
         }
 
-        /* MAIN CONTENT - INCREASED WIDTH HERE */
+        /* MAIN CONTENT */
         .main-content {
             margin-left: 280px;
             flex: 1;
@@ -80,11 +78,10 @@
 
         .form-card {
             width: 100%;
-            /* INCREASED MAX-WIDTH to 1200px for wider layout */
-            max-width: 1200px; 
+            max-width: 1200px; /* Wide Layout */
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 60px; /* More padding for spacious look */
+            padding: 60px;
             box-shadow: 0 4px 20px -1px rgba(0,0,0,0.08);
         }
 
@@ -181,7 +178,7 @@
         <div id="success-screen">
             <div class="success-icon">✓</div>
             <h1>Application Submitted!</h1>
-            <p style="color: #6b7280; font-size: 16px;">The candidate profile has been securely recorded in the system.</p>
+            <p style="color: #6b7280; font-size: 16px;">The candidate profile has been securely recorded.</p>
             <div class="id-badge" id="finalIdDisplay">...</div>
             <br><br><br>
             <button class="btn btn-back" onclick="window.location.reload()">Start New Application</button>
@@ -367,11 +364,13 @@
     // ============================================
     // 1. CONFIGURATION
     // ============================================
+    
     // 🔴 PASTE YOUR OPENAI API KEY BELOW 🔴
     const OPENAI_API_KEY = "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"; 
     
-    // 🔴 YOUR GOOGLE SCRIPT URL 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVnK-cmVL4PUEEcqdY7OP6-04y0MZzF3jfgp-bAzUJvhOD_1ROusnvv9gOzyWHVDi8/exec";
+    // 🔴 YOUR NEW GOOGLE SCRIPT URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwT4cldkXkAp8XHJKc-tM-2Eekc13iasSwmXqYAQZUSyUhaGfq2-wq3r8LvV-LoJrdC/exec";
+    
     // ============================================
 
     // 2. GENERATE LANGUAGE TABLE
@@ -444,7 +443,7 @@
         return valid;
     }
 
-    // 5. AI RESUME PARSING
+    // 5. AI RESUME PARSING (Direct Client Side for Speed)
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     let resumeFileBase64 = null; let resumeFileName = null; let resumeMimeType = null;
 
@@ -457,7 +456,7 @@
         reader.onload = (e) => resumeFileBase64 = e.target.result;
         reader.readAsDataURL(file);
         
-        // Remove error styling if exists
+        // Remove error styling
         document.getElementById('uploadZone').classList.remove('error');
 
         const status = document.getElementById('parsingStatus');
@@ -486,7 +485,7 @@
             set('fullName', json.fullName); set('emailId', json.email); set('contactNum', json.phone); 
             set('hometown', json.address); set('collegeName', json.collegeName); 
             
-            // Map Total Years from AI, default Months to 0
+            // Map Total Years
             set('totYears', Math.floor(json.expYears || 0)); 
             set('totMonths', 0);
             
@@ -512,7 +511,7 @@
         const get = (id) => document.getElementById(id)?.value || "";
         const visibleId = get('candidateId');
 
-        // Combine Experience Years and Months into a readable string for the backend
+        // Combine Exp
         const totalExp = `${get('totYears')} Y ${get('totMonths')} M`;
         const relExp = `${get('relYears')} Y ${get('relMonths')} M`;
 
@@ -528,7 +527,6 @@
             highQual: get('highestQual'), ug: get('ugDegree'), pg: get('pgDegree'), spec: get('specialization'),
             college: get('collegeName'), university: get('universityName'), yearComp: get('yearCompletion'), gaps: get('gaps'),
             
-            // Sending formatted string to backend (e.g., "5 Y 2 M")
             expTotal: totalExp, 
             expRel: relExp, 
             
