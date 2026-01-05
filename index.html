@@ -7,42 +7,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --sidebar-bg: #4a148c; --sidebar-text: #e1bee7; --accent: #4a148c; --bg-main: #f3f4f6; --text-main: #1f2937; }
+        :root {
+            --sidebar-bg: #4a148c; --sidebar-text: #e1bee7; --accent: #4a148c; 
+            --accent-light: rgba(74, 20, 140, 0.08); --bg-main: #f3f4f6; --card-bg: #ffffff; 
+            --text-main: #1f2937; --border: #e5e7eb; --success: #10b981; --error: #ef4444;
+        }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); margin: 0; display: flex; min-height: 100vh; }
+        
+        /* Layout */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 10; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .main-content { margin-left: 280px; flex: 1; padding: 40px; display: flex; justify-content: center; }
+        .form-card { width: 100%; max-width: 1200px; background: var(--card-bg); border-radius: 20px; padding: 60px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* Styling */
         .logo-container { text-align: center; margin-bottom: 40px; background: white; padding: 15px; border-radius: 12px; }
         .logo { max-width: 100%; height: auto; }
         .nav-step { display: flex; align-items: center; gap: 15px; padding: 16px; margin-bottom: 8px; border-radius: 10px; transition: 0.3s; cursor: pointer; font-size: 15px; font-weight: 500; }
         .nav-step.active { background: rgba(255,255,255,0.2); color: white; border-left: 4px solid #ffffff; }
+        .nav-step.completed { color: #a7f3d0; }
         .step-num { width: 28px; height: 28px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
-        .main-content { margin-left: 280px; flex: 1; padding: 40px; display: flex; justify-content: center; }
-        .form-card { width: 100%; max-width: 1200px; background: #ffffff; border-radius: 20px; padding: 60px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
         h2 { font-size: 24px; font-weight: 700; margin-bottom: 35px; color: #111827; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
         .full { grid-column: span 2; }
         label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 13px; color: #4b5563; text-transform: uppercase; }
-        label::after { content: " *"; color: #ef4444; }
-        input, select { width: 100%; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 15px; background: #ffffff; color: #1f2937; }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(74, 20, 140, 0.1); }
-        input.error, select.error { border-color: #ef4444; background: #fef2f2; }
+        label::after { content: " *"; color: var(--error); }
+        input, select { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: #ffffff; color: #1f2937; }
+        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+        input.error, select.error { border-color: var(--error); background: #fef2f2; }
+        
         .split-input { display: flex; gap: 15px; } .split-input div { flex: 1; position: relative; }
         .split-input div::after { content: attr(data-label); position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #9ca3af; font-weight: 700; }
         #candidateId { background: #f3f4f6; color: var(--accent); font-weight: 700; border-color: #e5e7eb; cursor: default; }
+        
         .upload-zone { border: 2px dashed #d1d5db; padding: 40px; text-align: center; border-radius: 15px; background: #f9fafb; margin-bottom: 40px; transition: 0.3s; cursor: pointer; }
-        .upload-zone:hover { border-color: var(--accent); background: rgba(74, 20, 140, 0.05); }
-        .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin-top: 5px; }
-        .matrix-table th { background: #f9fafb; padding: 14px; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; text-align: left; color: #6b7280; }
-        .matrix-table td { padding: 12px; text-align: center; border-bottom: 1px solid #e5e7eb; }
-        .actions { margin-top: 60px; display: flex; justify-content: space-between; padding-top: 30px; border-top: 1px solid #e5e7eb; }
+        .upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+        .upload-zone.error { border-color: var(--error); background: #fef2f2; }
+        
+        .actions { margin-top: 60px; display: flex; justify-content: space-between; padding-top: 30px; border-top: 1px solid var(--border); }
         .btn { padding: 14px 36px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 15px; }
-        .btn-next { background: var(--accent); color: white; } .btn-back { background: #fff; border: 1px solid #e5e7eb; color: #4b5563; }
-        .btn-submit { background: #10b981; color: white; } .btn-submit:disabled { background: #d1d5db; cursor: wait; }
+        .btn-next { background: var(--accent); color: white; }
+        .btn-back { background: #fff; border: 1px solid var(--border); color: #4b5563; }
+        .btn-submit { background: var(--success); color: white; } .btn-submit:disabled { background: #d1d5db; cursor: wait; }
+        
         .form-section { display: none; } .form-section.active { display: block; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         #success-screen { display: none; text-align: center; padding: 60px 0; }
         .success-icon { width: 90px; height: 90px; background: #d1fae5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 45px; margin: 0 auto 25px; }
-        .id-badge { background: #ecfdf5; color: #065f46; padding: 12px 24px; border-radius: 50px; font-weight: 700; display: inline-block; margin-top: 20px; border: 1px solid #6ee7b7; font-size: 20px; }
+        
+        .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 5px; }
+        .matrix-table th { background: #f9fafb; padding: 14px; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); text-align: left; color: #6b7280; }
+        .matrix-table td { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); }
+        
+        @media (max-width: 1200px) { .sidebar { width: 80px; padding: 20px 10px; } .sidebar span, .logo-container { display: none; } .main-content { margin-left: 80px; padding: 20px; } .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -58,17 +76,17 @@
 
 <div class="main-content">
     <div class="form-card">
+        
         <div id="success-screen">
             <div class="success-icon">✓</div>
             <h1>Application Submitted!</h1>
             <p>Candidate data secured.</p>
-            <div class="id-badge" id="finalIdDisplay">...</div>
-            <br><br><br>
+            <br>
             <button class="btn btn-back" onclick="window.location.reload()">Start New Application</button>
         </div>
 
         <form id="recruitmentWizard" novalidate>
-            <!-- SECTION 1 -->
+            <!-- S1 -->
             <div class="form-section active" id="sec1">
                 <h2>Candidate Basic Information</h2>
                 <div class="upload-zone" id="uploadZone">
@@ -81,7 +99,7 @@
                     <p id="parsingStatus" style="font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 15px;"></p>
                 </div>
                 <div class="grid">
-                    <div><label>Candidate ID</label><input type="text" id="candidateId" value="Connecting..." readonly></div>
+                    <div><label>Candidate ID</label><input type="text" id="candidateId" value="Loading..." readonly></div>
                     <div><label>Full Name</label><input type="text" id="fullName" required></div>
                     <div><label>Gender</label><select id="gender" required><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
                     <div><label>Contact Number</label><input type="text" id="contactNum" required></div>
@@ -96,23 +114,23 @@
                 <div class="actions"><div></div><button type="button" class="btn btn-next" onclick="nextStep(2)">Next Step</button></div>
             </div>
 
-            <!-- SECTION 2 -->
+            <!-- S2 -->
             <div class="form-section" id="sec2">
                 <h2>Education & Academic Details</h2>
                 <div class="grid">
-                    <div class="full"><label>Highest Qualification</label><select id="highestQual" required><option value="">Select</option><option>PUC</option><option>Diploma</option><option>UG</option><option>PG</option><option>PhD</option></select></div>
+                    <div class="full"><label>Highest Qualification</label><select id="highestQual" required><option value="">Select</option><option>PUC</option><option>Diploma</option><option value="Undergraduate (UG)">Undergraduate (UG)</option><option value="Postgraduate (PG)">Postgraduate (PG)</option><option>PhD</option></select></div>
                     <div class="full"><label>UG Degree</label><select id="ugDegree" required><option value="">Select</option><option>B.Tech</option><option>B.Com</option><option>B.Sc</option><option>Other</option></select></div>
-                    <div class="full"><label>PG Degree</label><select id="pgDegree" required><option value="">Select</option><option>NA</option><option>MBA</option><option>M.Tech</option><option>MCA</option></select></div>
+                    <div class="full"><label>PG Degree</label><select id="pgDegree" required><option value="">Select</option><option>Not Applicable</option><option>MBA</option><option>M.Tech</option><option>MCA</option></select></div>
                     <div class="full"><label>Specialization</label><select id="specialization" required><option value="">Select</option><option>CS</option><option>Finance</option><option>Marketing</option><option>HR</option></select></div>
                     <div><label>College Name</label><input type="text" id="collegeName" required></div>
-                    <div><label>University</label><input type="text" id="universityName" required></div>
+                    <div><label>University / Institution</label><input type="text" id="universityName" required></div>
                     <div><label>Year of Completion</label><input type="text" id="yearCompletion" required></div>
                     <div><label>Academic Gaps?</label><select id="gaps" required><option value="">Select</option><option>No</option><option>Yes</option></select></div>
                 </div>
                 <div class="actions"><button type="button" class="btn btn-back" onclick="nextStep(1)">Back</button><button type="button" class="btn btn-next" onclick="nextStep(3)">Next Step</button></div>
             </div>
 
-            <!-- SECTION 3 -->
+            <!-- S3 -->
             <div class="form-section" id="sec3">
                 <h2>Experience & Employment History</h2>
                 <div class="grid">
@@ -121,7 +139,7 @@
                     <div><label>Current Designation</label><input type="text" id="currDesg" required></div>
                     <div><label>Current / Last Company</label><input type="text" id="currComp" required></div>
                     <div class="full"><label>Industry</label><select id="industry" required><option value="">Select</option><option>IT</option><option>BFSI</option><option>EdTech</option></select></div>
-                    <div><label>Team Size</label><input type="text" id="teamSize" required></div>
+                    <div><label>Team Size Managed</label><input type="text" id="teamSize" required></div>
                     <div class="full"><label>Reason for Change</label><select id="reasonChange" required><option value="">Select</option><option>Growth</option><option>Compensation</option></select></div>
                     <div><label>Current CTC</label><input type="text" id="currCtc" required></div>
                     <div><label>Expected CTC</label><input type="text" id="expCtc" required></div>
@@ -130,7 +148,7 @@
                 <div class="actions"><button type="button" class="btn btn-back" onclick="nextStep(2)">Back</button><button type="button" class="btn btn-next" onclick="nextStep(4)">Next Step</button></div>
             </div>
 
-            <!-- SECTION 4 -->
+            <!-- S4 -->
             <div class="form-section" id="sec4">
                 <h2>Requisition Details</h2>
                 <div class="grid">
@@ -147,14 +165,14 @@
                 <div class="actions"><button type="button" class="btn btn-back" onclick="nextStep(3)">Back</button><button type="button" class="btn btn-next" onclick="nextStep(5)">Next Step</button></div>
             </div>
 
-            <!-- SECTION 5 -->
+            <!-- S5 -->
             <div class="form-section" id="sec5">
                 <h2>Interview Readiness</h2>
                 <div class="grid">
-                    <div><label>Status</label><select id="screenStatus" required><option value="">Select</option><option>Shortlisted</option><option>Reject</option></select></div>
-                    <div><label>Ready?</label><select id="interviewReady" required><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-                    <div><label>Mode</label><select id="intMode" required><option value="">Select</option><option>Face-to-Face</option><option>Virtual</option></select></div>
-                    <div><label>Availability</label><input type="date" id="availability" required></div>
+                    <div><label>Initial Screening Status</label><select id="screenStatus" required><option value="">Select</option><option>Shortlisted</option><option>Reject</option></select></div>
+                    <div><label>Interview Ready?</label><select id="interviewReady" required><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+                    <div><label>Preferred Interview Mode</label><select id="intMode" required><option value="">Select</option><option>Face-to-Face</option><option>Virtual</option></select></div>
+                    <div><label>Interview Availability</label><input type="date" id="availability" required></div>
                 </div>
                 <div class="actions"><button type="button" class="btn btn-back" onclick="nextStep(4)">Back</button><button type="submit" class="btn btn-submit">Submit Application</button></div>
             </div>
@@ -163,21 +181,20 @@
 </div>
 
 <script>
-    // 🔴 IMPORTANT: THIS URL MUST BE YOUR "NEW VERSION" DEPLOYMENT
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytHtMqaLwhnUx6hGJfuAI_HyzuDyfnTREk50V2ZS7a2l8dBFT7sy367dJer7mwsuVu/exec";
+    // 🔴 UPDATE SCRIPT URL IF NEEDED
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwT4cldkXkAp8XHJKc-tM-2Eekc13iasSwmXqYAQZUSyUhaGfq2-wq3r8LvV-LoJrdC/exec";
 
-    // Setup
+    // Init
     const langs = ["English", "Kannada", "Tamil", "Hindi", "Malayalam", "Telugu"];
     const lb = document.getElementById('langBody');
     langs.forEach(l => lb.innerHTML+=`<tr><td>${l}</td><td align="center"><input type="checkbox" class="lc" data-l="${l}" data-t="R"></td><td align="center"><input type="checkbox" class="lc" data-l="${l}" data-t="W"></td><td align="center"><input type="checkbox" class="lc" data-l="${l}" data-t="S"></td></tr>`);
 
-    // ID Fetch
     window.onload = async () => {
         try { document.getElementById('candidateId').value = (await (await fetch(GOOGLE_SCRIPT_URL + "?t=" + Date.now())).json()).id || "USDC-REC-00001"; }
         catch { document.getElementById('candidateId').value = "Error"; }
     };
 
-    // Validation
+    // Nav & Validate
     function nextStep(t) {
         if(validate(`sec${t-1}`)) {
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
@@ -192,116 +209,99 @@
     function validate(id) {
         let valid = true;
         document.getElementById(id).querySelectorAll('input[required], select[required]').forEach(i => {
-            if(!i.value.trim()){ valid = false; i.classList.add('error'); } else { i.classList.remove('error'); }
+            if(!i.value.trim()){ valid=false; i.classList.add('error'); } else { i.classList.remove('error'); }
         });
         if(id==='sec1') {
-            if(document.getElementById('resumeUpload').files.length === 0) { 
-                valid=false; document.getElementById('uploadZone').classList.add('error'); 
-            } else { document.getElementById('uploadZone').classList.remove('error'); }
+            const f = document.getElementById('resumeUpload');
+            if(f.files.length===0){ valid=false; document.getElementById('uploadZone').classList.add('error'); }
+            else { document.getElementById('uploadZone').classList.remove('error'); }
         }
         if(!valid) alert("Please fill all required fields.");
         return valid;
     }
 
-    // AI Parsing (SECURE VIA GOOGLE SCRIPT)
+    // AI Parse
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    
+    let b64=null, fName=null, mType=null;
+
     document.getElementById('resumeUpload').addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if(!file) return;
+        const f = e.target.files[0]; if(!f)return;
+        fName=f.name; mType=f.type;
+        const r=new FileReader(); r.onload=e=>b64=e.target.result; r.readAsDataURL(f);
         
-        const statusText = document.getElementById('parsingStatus');
-        statusText.innerText = "Reading PDF...";
-        
+        const st = document.getElementById('parsingStatus'); st.innerText="Reading...";
+        document.getElementById('uploadZone').classList.remove('error');
+
         try {
-            const buffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(buffer).promise;
-            let text = "";
-            for(let i=1; i<=Math.min(pdf.numPages, 2); i++) {
-                text += " " + (await (await pdf.getPage(i)).getTextContent()).items.map(s=>s.str).join(' ');
-            }
+            const pdf = await pdfjsLib.getDocument(await f.arrayBuffer()).promise;
+            let txt = ""; for(let i=1;i<=Math.min(pdf.numPages,2);i++) txt += " "+(await(await pdf.getPage(i)).getTextContent()).items.map(s=>s.str).join(' ');
             
-            statusText.innerText = "Asking AI (Securely)...";
-
-            // SEND TEXT TO GOOGLE SCRIPT
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                // We use 'text/plain' to avoid CORS preflight complications with GAS
-                // The body is a stringified JSON object
-                headers: { "Content-Type": "text/plain" }, 
-                body: JSON.stringify({ 
-                    action: "parse_resume", 
-                    text: text 
-                })
+            st.innerText="AI Analyzing...";
+            
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST", headers:{"Content-Type":"text/plain"},
+                body: JSON.stringify({ action: "parse_resume", text: txt })
             });
-
-            const data = await response.json();
+            const d = await res.json();
             
-            if(data.error) {
-                statusText.innerText = "AI Error: " + data.error;
-                return;
+            if(d.error) { st.innerText="AI Error: "+d.error; return; }
+
+            const s = (i,v) => { if(document.getElementById(i)) document.getElementById(i).value = v||""; };
+            s('fullName', d.fullName); s('emailId', d.email); s('contactNum', d.phone);
+            s('hometown', d.address); s('collegeName', d.collegeName); 
+            s('totYears', d.expYears||0); s('totMonths', d.expMonths||0);
+            s('currComp', d.currentCompany); s('currDesg', d.designation);
+            
+            if(d.highestQualification) {
+                const hq = document.getElementById('highestQual');
+                for(let opt of hq.options) {
+                    if(opt.value.includes(d.highestQualification) || d.highestQualification.includes(opt.value)) {
+                        hq.value = opt.value; break;
+                    }
+                }
+            }
+            
+            if(d.degree) {
+               // Try to match degree
+               const dg = document.getElementById('ugDegree'); // Simplified Check
+               for(let opt of dg.options) if(d.degree.includes(opt.value)) dg.value = opt.value;
             }
 
-            // Fill Fields
-            const set = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val || ""; };
-            set('fullName', data.fullName);
-            set('emailId', data.email);
-            set('contactNum', data.phone);
-            set('hometown', data.address);
-            set('collegeName', data.collegeName);
-            set('totYears', Math.floor(data.expYears || 0)); set('totMonths', 0);
-            set('currComp', data.currentCompany);
-            set('currDesg', data.designation);
+            if(d.gender) document.getElementById('gender').value = d.gender.includes('Fem') ? 'Female' : 'Male';
             
-            if(data.gender) document.getElementById('gender').value = data.gender.includes('Fem') ? 'Female' : 'Male';
+            st.innerText="✓ Auto-Filled!";
+            st.style.color="green";
 
-            statusText.innerText = "✓ Auto-Filled!";
-            statusText.style.color = "green";
-
-        } catch (err) {
-            console.error(err);
-            statusText.innerText = "Parsing Failed (Manual Fill Required).";
-            statusText.style.color = "red";
-        }
+        } catch(e) { console.error(e); st.innerText="Manual Fill Required"; st.style.color="red"; }
     });
 
     // Submit
     document.getElementById('recruitmentWizard').onsubmit = async (e) => {
-        e.preventDefault();
-        if(!validate('sec5')) return;
+        e.preventDefault(); if(!validate('sec5')) return;
+        const btn = document.querySelector('.btn-submit'); btn.innerText="Sending..."; btn.disabled=true;
+        const g = i => document.getElementById(i)?.value||"";
         
-        const btn = document.querySelector('.btn-submit');
-        btn.innerText = "Sending..."; btn.disabled = true;
-        
-        const g = (i) => document.getElementById(i)?.value || "";
-        let lStr = ""; document.querySelectorAll('.lc:checked').forEach(c => lStr += `${c.dataset.l}(${c.dataset.t}) `);
+        let lStr=""; document.querySelectorAll('.lc:checked').forEach(c=>lStr+=`${c.dataset.l}(${c.dataset.t}) `);
 
-        // Read file as Base64 for upload
-        const file = document.getElementById('resumeUpload').files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-            const payload = {
-                fullName: g('fullName'), gender: g('gender'), contact: g('contactNum'), email: g('emailId'),
-                hometown: g('hometown'), currLoc: g('currLocation'), prefLoc: g('prefLoc'), relocate: g('relocate'), zone: g('zone'),
-                languages: lStr, highQual: g('highestQual'), ug: g('ugDegree'), pg: g('pgDegree'), spec: g('specialization'),
-                college: g('collegeName'), university: g('universityName'), yearComp: g('yearCompletion'), gaps: g('gaps'),
-                expTotal: `${g('totYears')}Y ${g('totMonths')}M`, expRel: `${g('relYears')}Y ${g('relMonths')}M`,
-                currComp: g('currComp'), currDesg: g('currDesg'), industry: g('industry'), teamSize: g('teamSize'), reason: g('reasonChange'),
-                currCtc: g('currCtc'), expCtc: g('expCtc'), notice: g('noticePeriod'),
-                dept: g('dept'), role: g('role'), jobLevel: g('jobLevel'), empType: g('empType'),
-                hm: g('hiringManager'), recruiter: g('recruiter'), profDate: g('profileDate'), srcType: g('sourceType'), srcName: g('sourceName'),
-                status: g('screenStatus'), ready: g('interviewReady'), mode: g('intMode'), avail: g('availability'),
-                resumeData: reader.result, resumeName: file.name, resumeMimeType: file.type
-            };
-
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, { method:"POST", headers:{"Content-Type": "text/plain"}, body:JSON.stringify(payload) });
-                document.getElementById('recruitmentWizard').style.display='none';
-                document.getElementById('success-screen').style.display='block';
-                document.getElementById('finalIdDisplay').innerText = g('candidateId');
-            } catch(e) { alert("Error submitting."); btn.disabled = false; }
+        const payload = {
+            fullName:g('fullName'), gender:g('gender'), contact:g('contactNum'), email:g('emailId'),
+            hometown:g('hometown'), currLoc:g('currLocation'), prefLoc:g('prefLoc'), relocate:g('relocate'), zone:g('zone'),
+            languages:lStr, highQual:g('highestQual'), ug:g('ugDegree'), pg:g('pgDegree'), spec:g('specialization'),
+            college:g('collegeName'), university:g('universityName'), yearComp:g('yearCompletion'), gaps:g('gaps'),
+            expTotal:`${g('totYears')}Y ${g('totMonths')}M`, expRel:`${g('relYears')}Y ${g('relMonths')}M`,
+            currComp:g('currComp'), currDesg:g('currDesg'), industry:g('industry'), teamSize:g('teamSize'), reason:g('reasonChange'),
+            currCtc:g('currCtc'), expCtc:g('expCtc'), notice:g('noticePeriod'),
+            dept:g('dept'), role:g('role'), jobLevel:g('jobLevel'), empType:g('empType'),
+            hm:g('hiringManager'), recruiter:g('recruiter'), profDate:g('profileDate'), srcType:g('sourceType'), srcName:g('sourceName'),
+            status:g('screenStatus'), ready:g('interviewReady'), mode:g('intMode'), avail:g('availability'),
+            resumeData:b64, resumeName:fName, resumeMimeType:mType
         };
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, { method:"POST", headers:{"Content-Type":"text/plain"}, body:JSON.stringify(payload) });
+            document.getElementById('recruitmentWizard').style.display='none';
+            document.getElementById('success-screen').style.display='block';
+        } catch(e) { alert("Error submitting."); btn.disabled=false; }
     };
 </script>
 
