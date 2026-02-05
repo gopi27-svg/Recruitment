@@ -153,6 +153,18 @@
                     <div><label>Interview Ready?</label><select id="interviewReady" required><option value="">Select</option><option>Yes</option><option>No</option></select></div>
                     <div><label>Preferred Interview Mode</label><select id="intMode" required><option value="">Select</option><option>Face-to-Face</option><option>Virtual</option></select></div>
                     <div><label>Interview Availability</label><input type="date" id="availability" required></div>
+                    <div>
+                        <label>Resume updated by</label>
+                        <select id="resumeUpdatedBy" required>
+                            <option value="">Select</option>
+                            <option>Sirivanth T S</option>
+                            <option>Sumedh Mahesh</option>
+                            <option>Unnati S Rao</option>
+                            <option>Manish PM</option>
+                            <option>Abhay</option>
+                            <option>Surya PR</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="actions"><button type="button" class="btn btn-back" onclick="goBack(4)">Back</button><button type="submit" class="btn btn-submit">Submit Application</button></div>
             </div>
@@ -283,6 +295,7 @@
                 dept:g('dept'), role:g('role'), jobLevel:g('jobLevel'), empType:g('empType'),
                 hm:g('hiringManager'), recruiter:g('recruiter'), profDate:g('profileDate'), srcType:g('sourceType'), srcName:g('sourceName'),
                 status:g('screenStatus'), ready:g('interviewReady'), mode:g('intMode'), avail:g('availability'),
+                updatedBy: g('resumeUpdatedBy'), // Added New Field to Payload
                 resumeData:reader.result, resumeName:f.name, resumeMimeType:f.type
             };
             try {
