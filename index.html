@@ -189,7 +189,63 @@
         } catch { document.getElementById('candidateId').value = "Error"; }
     };
 
-    function go(step) {
+        // Duplicate check state
+    let duplicateContactBlocked = false;
+    let duplicateEmailBlocked = false;
+
+    async function checkDuplicateField(type, value) {
+        if (!value || value.trim() === '') return;
+        try {
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                headers: {"Content-Type": "text/plain"},
+                body: JSON.stringify({ action: "check_duplicate", type: type, value: value.trim() })
+            });
+            const result = await res.json();
+            const fieldId = type === 'contact' ? 'contactNum' : 'emailId';
+            const field = document.getElementById(fieldId);
+            const errId = type === 'contact' ? 'contactDupErr' : 'emailDupErr';
+            let errEl = document.getElementById(errId);
+
+            if (result.isDuplicate) {
+                field.classList.add('error');
+                if (!errEl) {
+                    errEl = document.createElement('div');
+                    errEl.id = errId;
+                    errEl.style.cssText = 'color:#ef4444; font-size:12px; margin-top:5px; font-weight:600;';
+                    field.parentNode.appendChild(errEl);
+                }
+                errEl.innerText = '\u26a0\ufe0f Already exists! Existing ID: ' + result.existingId;
+                if (type === 'contact') duplicateContactBlocked = true;
+                else duplicateEmailBlocked = true;
+            } else {
+                field.classList.remove('error');
+                if (errEl) errEl.remove();
+                if (type === 'contact') duplicateContactBlocked = false;
+                else duplicateEmailBlocked = false;
+            }
+        } catch(e) { /* silently ignore network errors during check */ }
+    }
+
+    // Attach blur listeners to Contact and Email fields
+    document.getElementById('contactNum').addEventListener('blur', function() {
+        checkDuplicateField('contact', this.value);
+    });
+    document.getElementById('emailId').addEventListener('blur', function() {
+        checkDuplicateField('email', this.value);
+    });
+
+    async function go(step) {
+        if (step === 2) {
+            const contact = document.getElementById('contactNum').value.trim();
+            const email = document.getElementById('emailId').value.trim();
+            if (contact) await checkDuplicateField('contact', contact);
+            if (email) await checkDuplicateField('email', email);
+            if (duplicateContactBlocked || duplicateEmailBlocked) {
+                alert('\u26a0\ufe0f Duplicate Entry Detected!\n\nA candidate with this Contact Number or Email ID already exists.\nPlease correct the details before proceeding.');
+                return;
+            }
+        }
         if(validateSection('sec'+(step-1))) {
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`sec${step}`).classList.add('active');
