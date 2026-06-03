@@ -158,7 +158,12 @@
                             <option>Manish PM</option>
                             <option>Abhay</option>
                             <option>Surya PR</option>
+                            <option>Jayashree S</option>
                         </select>
+                    </div>
+                    <div class="full">
+                        <label>Feedback</label>
+                        <textarea id="feedback" rows="4" style="width:100%; padding:14px 16px; border:1px solid #e5e7eb; border-radius:8px; font-size:15px; background:#ffffff; color:#1f2937; font-family:'Plus Jakarta Sans',sans-serif; resize:vertical;" placeholder="Enter your feedback here..."></textarea>
                     </div>
                 </div>
                 <div class="actions"><button type="button" class="btn btn-back" onclick="go(4)">Back</button><button type="submit" class="btn btn-submit">Submit Application</button></div>
@@ -268,13 +273,23 @@
                 hm:g('hiringManager'), recruiter:g('recruiter'), profDate:g('profileDate'), srcType:g('sourceType'), srcName:g('sourceName'),
                 status:g('screenStatus'), ready:g('interviewReady'), mode:g('intMode'), avail:g('availability'),
                 updatedBy: g('resumeUpdatedBy'),
+                feedback: g('feedback'),
                 resumeData:reader.result, resumeName:f.name, resumeMimeType:f.type
             };
             try {
-                await fetch(GOOGLE_SCRIPT_URL, { method:"POST", body:JSON.stringify(payload) });
-                document.getElementById('recruitmentWizard').style.display='none';
-                document.getElementById('success-screen').style.display='block';
-                document.getElementById('finalIdDisplay').innerText = g('candidateId');
+                const res = await fetch(GOOGLE_SCRIPT_URL, { method:"POST", body:JSON.stringify(payload) });
+                const result = await res.json();
+                if (result.result === "duplicate") {
+                    alert("⚠️ Duplicate Entry Blocked!\n\n" + result.message + "\n\nPlease verify the Contact Number and Email ID.");
+                    btn.disabled=false; btn.innerText="Submit Application";
+                } else if (result.result === "success") {
+                    document.getElementById('recruitmentWizard').style.display='none';
+                    document.getElementById('success-screen').style.display='block';
+                    document.getElementById('finalIdDisplay').innerText = g('candidateId');
+                } else {
+                    alert("Error: " + (result.error || "Unknown error occurred."));
+                    btn.disabled=false; btn.innerText="Submit Application";
+                }
             } catch(e) { alert("Error submitting."); btn.disabled=false; btn.innerText="Submit Application"; }
         };
     };
